@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>坑位信息查询系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .search-section {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-type {
+            padding: 12px 16px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            outline: none;
+        }
+        
+        .search-type:focus {
+            border-color: #764ba2;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            max-width: 400px;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: #667eea;
+        }
+        
+        .search-btn {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .search-btn:active {
+            transform: translateY(0);
+        }
+        
+        .stats {
+            text-align: center;
+            padding: 15px;
+            background: #fff;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .stats span {
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .result-section {
+            padding: 20px;
+        }
+        
+        .result-info {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            background: #e8f4fd;
+            border-radius: 8px;
+            color: #1976d2;
+            font-size: 14px;
+        }
+        
+        .no-result {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .no-result svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #667eea;
+        }
+        
+        .loading p {
+            margin-top: 15px;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 60px 20px;
+            color: #e74c3c;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        th {
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                max-width: 100%;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 坑位信息查询系统</h1>
+            <p>支持微信昵称模糊查询，微信ID/手机号精确查询</p>
+        </div>
+        
+        <div class="search-section">
+            <div class="search-box">
+                <select class="search-type" id="searchType">
+                    <option value="nickname">微信昵称（模糊）</option>
+                    <option value="wxid">微信ID（精确）</option>
+                    <option value="phone">手机号（精确）</option>
+                </select>
+                <input type="text" class="search-input" id="searchInput" placeholder="请输入查询内容...">
+                <button class="search-btn" onclick="search()">查询</button>
+            </div>
+        </div>
+        
+        <div class="stats">
+            共 <span id="totalCount">加载中...</span> 条坑位信息 | 数据更新时间：<span id="updateTime">--</span>
+        </div>
+        
+        <div class="result-section" id="resultSection">
+            <div class="loading" id="loading">
+                <svg width="50" height="50" viewBox="0 0 50 50">
+                    <circle cx="25" cy="25" r="20" fill="none" stroke="#667eea" stroke-width="4" stroke-dasharray="80, 200" stroke-linecap="round">
+                        <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
+                    </circle>
+                </svg>
+                <p>正在加载数据...</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            数据更新时间：请查看页面上方显示的时间
+        </div>
+    </div>
+
+    <script>
+        let DATA = [];
+        const UPDATE_TIME = '2026-04-07 16:30'; // 每次更新数据时手动修改这里
+        
+        // 页面加载时获取数据
+        async function loadData() {
+            try {
+                const response = await fetch('./data.json');
+                if (!response.ok) throw new Error('数据加载失败');
+                DATA = await response.json();
+                
+                document.getElementById('totalCount').textContent = DATA.length;
+                document.getElementById('updateTime').textContent = UPDATE_TIME;
+                document.getElementById('resultSection').innerHTML = `
+                    <div class="no-result">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                        <p>输入关键词开始查询</p>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('resultSection').innerHTML = `
+                    <div class="error">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="60" height="60">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                        <p>数据加载失败，请刷新页面重试</p>
+                    </div>
+                `;
+                document.getElementById('totalCount').textContent = '加载失败';
+            }
+        }
+        
+        // 初始化
+        loadData();
+        
+        // 回车搜索
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                search();
+            }
+        });
+        
+        function search() {
+            const type = document.getElementById('searchType').value;
+            const keyword = document.getElementById('searchInput').value.trim();
+            
+            if (!keyword) {
+                alert('请输入查询内容');
+                return;
+            }
+            
+            if (DATA.length === 0) {
+                alert('数据正在加载，请稍后再试');
+                return;
+            }
+            
+            let results = [];
+            
+            if (type === 'nickname') {
+                // 昵称模糊匹配
+                results = DATA.filter(item => {
+                    const nickname = item['微信昵称'] || '';
+                    return nickname.includes(keyword);
+                });
+            } else if (type === 'wxid') {
+                // 微信ID精确匹配
+                results = DATA.filter(item => {
+                    const wxid = item['微信ID'] || '';
+                    return wxid === keyword;
+                });
+            } else if (type === 'phone') {
+                // 手机号精确匹配
+                results = DATA.filter(item => {
+                    const phone = String(item['手机号码'] || '');
+                    return phone === keyword;
+                });
+            }
+            
+            displayResults(results, type, keyword);
+        }
+        
+        function displayResults(results, type, keyword) {
+            const section = document.getElementById('resultSection');
+            
+            if (results.length === 0) {
+                section.innerHTML = `
+                    <div class="no-result">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M8 15s1.5 2 4 2 4-2 4-2"/>
+                            <line x1="9" y1="9" x2="9.01" y2="9"/>
+                            <line x1="15" y1="9" x2="15.01" y2="9"/>
+                        </svg>
+                        <p>未找到匹配的记录</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const typeText = type === 'nickname' ? '微信昵称' : (type === 'wxid' ? '微信ID' : '手机号');
+            
+            let html = `
+                <div class="result-info">
+                    找到 <strong>${results.length}</strong> 条匹配记录（${typeText}：${keyword}）
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>设备编码2</th>
+                                <th>手机号码</th>
+                                <th>微信ID</th>
+                                <th>微信昵称</th>
+                                <th>设备状态</th>
+                                <th>是否实名</th>
+                                <th>坑位使用人</th>
+                                <th>剩余坑位数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            results.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item['设备编码2'] || '--'}</td>
+                        <td>${item['手机号码'] || '--'}</td>
+                        <td>${item['微信ID'] || '--'}</td>
+                        <td>${highlightKeyword(item['微信昵称'] || '--', keyword, type)}</td>
+                        <td>${item['设备状态'] || '--'}</td>
+                        <td>${item['是否实名'] || '--'}</td>
+                        <td>${item['坑位使用人'] || '--'}</td>
+                        <td>${item['剩余坑位数'] || '--'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            section.innerHTML = html;
+        }
+        
+        function highlightKeyword(text, keyword, type) {
+            if (type === 'nickname') {
+                // 模糊匹配时高亮关键词
+                const regex = new RegExp(`(${escapeRegExp(keyword)})`, 'gi');
+                return text.replace(regex, '<span class="highlight">$1</span>');
+            }
+            return text;
+        }
+        
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+    </script>
+</body>
+</html>
