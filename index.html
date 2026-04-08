@@ -266,17 +266,20 @@
 
     <script>
         let DATA = [];
-        const UPDATE_TIME = '2026-04-07 16:30'; // 每次更新数据时手动修改这里
         
         // 页面加载时获取数据
         async function loadData() {
             try {
                 const response = await fetch('./data.json');
                 if (!response.ok) throw new Error('数据加载失败');
-                DATA = await response.json();
+                const jsonData = await response.json();
+                
+                // 从JSON中读取数据和时间
+                DATA = jsonData.data || jsonData; // 兼容旧格式
+                const updateTime = jsonData.update_time || '未知';
                 
                 document.getElementById('totalCount').textContent = DATA.length;
-                document.getElementById('updateTime').textContent = UPDATE_TIME;
+                document.getElementById('updateTime').textContent = updateTime;
                 document.getElementById('resultSection').innerHTML = `
                     <div class="no-result">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
