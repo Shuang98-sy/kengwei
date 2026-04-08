@@ -56,6 +56,7 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
+            margin-bottom: 15px;
         }
         
         .search-type {
@@ -109,6 +110,37 @@
             transform: translateY(0);
         }
         
+        /* 快速筛选按钮样式 */
+        .quick-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #555;
+        }
+        
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+        }
+        
         .stats {
             text-align: center;
             padding: 15px;
@@ -133,6 +165,30 @@
             border-radius: 8px;
             color: #1976d2;
             font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .sort-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sort-controls label {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .sort-select {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
         }
         
         .no-result {
@@ -201,6 +257,31 @@
             border-radius: 3px;
         }
         
+        /* 剩余可加群聊数颜色标记 */
+        .slot-count {
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .slot-high {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .slot-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .slot-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
         .footer {
             text-align: center;
             padding: 20px;
@@ -222,6 +303,11 @@
                 padding: 10px 8px;
                 font-size: 13px;
             }
+            
+            .result-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -241,6 +327,22 @@
                 </select>
                 <input type="text" class="search-input" id="searchInput" placeholder="请输入查询内容...">
                 <button class="search-btn" onclick="search()">查询</button>
+            </div>
+            
+            <!-- 快速筛选按钮 -->
+            <div class="quick-filters">
+                <button class="filter-btn" id="filterAvailable" onclick="toggleFilter('available')">
+                    可加群（剩余>0）
+                </button>
+                <button class="filter-btn" id="filterPhone" onclick="toggleFilter('phone')">
+                    有手机号
+                </button>
+                <button class="filter-btn" id="filterVerified" onclick="toggleFilter('verified')">
+                    已实名
+                </button>
+                <button class="filter-btn" id="filterClear" onclick="clearFilters()" style="background: #f8f9fa; color: #666;">
+                    清除筛选
+                </button>
             </div>
         </div>
         
@@ -266,6 +368,13 @@
 
     <script>
         let DATA = [];
+        let activeFilters = {
+            available: false,
+            phone: false,
+            verified: false
+        };
+        let currentSort = 'none';
+        let lastSearchResults = [];
         
         // 页面加载时获取数据
         async function loadData() {
@@ -314,6 +423,41 @@
             }
         });
         
+        // 快速筛选切换
+        function toggleFilter(filterType) {
+            activeFilters[filterType] = !activeFilters[filterType];
+            
+            const btn = document.getElementById('filter' + filterType.charAt(0).toUpperCase() + filterType.slice(1));
+            if (activeFilters[filterType]) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+            
+            // 如果有搜索结果，重新应用筛选
+            if (lastSearchResults.length > 0) {
+                applyFiltersAndDisplay();
+            }
+        }
+        
+        // 清除所有筛选
+        function clearFilters() {
+            activeFilters = {
+                available: false,
+                phone: false,
+                verified: false
+            };
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 如果有搜索结果，重新显示
+            if (lastSearchResults.length > 0) {
+                applyFiltersAndDisplay();
+            }
+        }
+        
         function search() {
             const type = document.getElementById('searchType').value;
             const keyword = document.getElementById('searchInput').value.trim();
@@ -350,7 +494,61 @@
                 });
             }
             
-            displayResults(results, type, keyword);
+            lastSearchResults = results;
+            lastSearchType = type;
+            lastSearchKeyword = keyword;
+            
+            applyFiltersAndDisplay();
+        }
+        
+        function applyFiltersAndDisplay() {
+            let filtered = [...lastSearchResults];
+            
+            // 应用筛选
+            if (activeFilters.available) {
+                filtered = filtered.filter(item => {
+                    const slots = parseInt(item['剩余可加群聊数']) || 0;
+                    return slots > 0;
+                });
+            }
+            
+            if (activeFilters.phone) {
+                filtered = filtered.filter(item => {
+                    const phone = item['手机号'];
+                    return phone && phone !== '--' && phone !== '';
+                });
+            }
+            
+            if (activeFilters.verified) {
+                filtered = filtered.filter(item => {
+                    const verified = item['实名认证'] || '';
+                    return verified.includes('已') || verified.includes('是') || verified === '已实名';
+                });
+            }
+            
+            // 应用排序
+            if (currentSort === 'desc') {
+                filtered.sort((a, b) => {
+                    const slotsA = parseInt(a['剩余可加群聊数']) || 0;
+                    const slotsB = parseInt(b['剩余可加群聊数']) || 0;
+                    return slotsB - slotsA;
+                });
+            } else if (currentSort === 'asc') {
+                filtered.sort((a, b) => {
+                    const slotsA = parseInt(a['剩余可加群聊数']) || 0;
+                    const slotsB = parseInt(b['剩余可加群聊数']) || 0;
+                    return slotsA - slotsB;
+                });
+            }
+            
+            displayResults(filtered, lastSearchType, lastSearchKeyword);
+        }
+        
+        function sortResults() {
+            currentSort = document.getElementById('sortSelect').value;
+            if (lastSearchResults.length > 0) {
+                applyFiltersAndDisplay();
+            }
         }
         
         function displayResults(results, type, keyword) {
@@ -375,7 +573,15 @@
             
             let html = `
                 <div class="result-info">
-                    找到 <strong>${results.length}</strong> 条匹配记录（${typeText}：${keyword}）
+                    <div>找到 <strong>${results.length}</strong> 条匹配记录（${typeText}：${keyword}）</div>
+                    <div class="sort-controls">
+                        <label>排序：</label>
+                        <select class="sort-select" id="sortSelect" onchange="sortResults()">
+                            <option value="none">默认</option>
+                            <option value="desc">剩余可加群聊数 ↓</option>
+                            <option value="asc">剩余可加群聊数 ↑</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table>
@@ -395,6 +601,14 @@
             `;
             
             results.forEach(item => {
+                const slots = parseInt(item['剩余可加群聊数']) || 0;
+                let slotClass = 'slot-low';
+                if (slots > 5) {
+                    slotClass = 'slot-high';
+                } else if (slots > 0) {
+                    slotClass = 'slot-medium';
+                }
+                
                 html += `
                     <tr>
                         <td>${item['设备编码2'] || '--'}</td>
@@ -404,7 +618,7 @@
                         <td>${item['实名认证'] || '--'}</td>
                         <td>${item['设备状态'] || '--'}</td>
                         <td>${item['投产状态'] || '--'}</td>
-                        <td>${item['剩余可加群聊数'] || '--'}</td>
+                        <td><span class="slot-count ${slotClass}">${slots}</span></td>
                     </tr>
                 `;
             });
@@ -416,6 +630,11 @@
             `;
             
             section.innerHTML = html;
+            
+            // 恢复排序选择状态
+            if (currentSort !== 'none') {
+                document.getElementById('sortSelect').value = currentSort;
+            }
         }
         
         function highlightKeyword(text, keyword, type) {
