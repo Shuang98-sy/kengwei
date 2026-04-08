@@ -236,7 +236,7 @@
             <div class="search-box">
                 <select class="search-type" id="searchType">
                     <option value="nickname">微信昵称（模糊）</option>
-                    <option value="wxid">微信ID（精确）</option>
+                    <option value="wxid">微信号（精确）</option>
                     <option value="phone">手机号（精确）</option>
                 </select>
                 <input type="text" class="search-input" id="searchInput" placeholder="请输入查询内容...">
@@ -266,7 +266,7 @@
 
     <script>
         let DATA = [];
-        const UPDATE_TIME = '2026-04-08 06:12'; // 每次更新数据时手动修改这里
+        const UPDATE_TIME = '2026-04-07 16:30'; // 每次更新数据时手动修改这里
         
         // 页面加载时获取数据
         async function loadData() {
@@ -334,15 +334,15 @@
                     return nickname.includes(keyword);
                 });
             } else if (type === 'wxid') {
-                // 微信ID精确匹配
+                // 微信号精确匹配
                 results = DATA.filter(item => {
-                    const wxid = item['微信ID'] || '';
+                    const wxid = item['微信号'] || '';
                     return wxid === keyword;
                 });
             } else if (type === 'phone') {
                 // 手机号精确匹配
                 results = DATA.filter(item => {
-                    const phone = String(item['手机号码'] || '');
+                    const phone = String(item['手机号'] || '');
                     return phone === keyword;
                 });
             }
@@ -368,7 +368,7 @@
                 return;
             }
             
-            const typeText = type === 'nickname' ? '微信昵称' : (type === 'wxid' ? '微信ID' : '手机号');
+            const typeText = type === 'nickname' ? '微信昵称' : (type === 'wxid' ? '微信号' : '手机号');
             
             let html = `
                 <div class="result-info">
@@ -379,13 +379,13 @@
                         <thead>
                             <tr>
                                 <th>设备编码2</th>
-                                <th>手机号码</th>
-                                <th>微信ID</th>
+                                <th>手机号</th>
+                                <th>微信号</th>
                                 <th>微信昵称</th>
+                                <th>实名认证</th>
                                 <th>设备状态</th>
-                                <th>是否实名</th>
-                                <th>坑位使用人</th>
-                                <th>剩余坑位数</th>
+                                <th>投产状态</th>
+                                <th>剩余可加群聊数</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -395,13 +395,13 @@
                 html += `
                     <tr>
                         <td>${item['设备编码2'] || '--'}</td>
-                        <td>${item['手机号码'] || '--'}</td>
-                        <td>${item['微信ID'] || '--'}</td>
+                        <td>${item['手机号'] || '--'}</td>
+                        <td>${item['微信号'] || '--'}</td>
                         <td>${highlightKeyword(item['微信昵称'] || '--', keyword, type)}</td>
+                        <td>${item['实名认证'] || '--'}</td>
                         <td>${item['设备状态'] || '--'}</td>
-                        <td>${item['是否实名'] || '--'}</td>
-                        <td>${item['坑位使用人'] || '--'}</td>
-                        <td>${item['剩余坑位数'] || '--'}</td>
+                        <td>${item['投产状态'] || '--'}</td>
+                        <td>${item['剩余可加群聊数'] || '--'}</td>
                     </tr>
                 `;
             });
