@@ -33,13 +33,24 @@
             background: #f8f9fa;
             border-bottom: 1px solid #e9ecef;
         }
-        .search-box {
+        .search-row {
             display: flex;
             gap: 12px;
-            flex-wrap: wrap;
             align-items: center;
             justify-content: center;
+            margin-bottom: 10px;
+        }
+        .batch-tip {
+            font-size: 11px;
+            color: #999;
+            text-align: center;
             margin-bottom: 15px;
+        }
+        .quick-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .search-type {
             padding: 12px 16px;
@@ -70,15 +81,9 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
+            white-space: nowrap;
         }
         .search-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
-        .quick-filters {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 15px;
-        }
         .filter-btn {
             padding: 8px 16px;
             background: white;
@@ -94,7 +99,6 @@
             border-color: #667eea;
             color: white;
         }
-        .batch-tip { font-size: 12px; color: #999; text-align: center; margin-top: 10px; }
         .stats {
             text-align: center;
             padding: 15px;
@@ -194,15 +198,20 @@
             .header { padding: 20px; }
             .header h1 { font-size: 22px; }
             .search-section { padding: 20px; }
-            .search-box { flex-direction: column; }
-            .search-input { max-width: 100%; }
+            .search-row { 
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .search-input { max-width: 100%; min-width: 150px; }
+            .stats { font-size: 12px; padding: 10px; }
             .result-section { padding: 15px; }
-            .result-info { flex-direction: column; align-items: stretch; }
+            .result-info { flex-direction: column; align-items: stretch; font-size: 13px; }
             .result-actions { flex-wrap: wrap; justify-content: space-between; }
             .table-container { display: none; }
             .card-container { display: flex; }
             .quick-filters { gap: 8px; }
             .filter-btn { padding: 6px 12px; font-size: 12px; }
+            .batch-tip { font-size: 10px; }
         }
     </style>
 </head>
@@ -213,7 +222,7 @@
             <p>支持微信昵称模糊查询，微信ID/手机号精确查询</p>
         </div>
         <div class="search-section">
-            <div class="search-box">
+            <div class="search-row">
                 <select class="search-type" id="searchType">
                     <option value="nickname">微信昵称（模糊）</option>
                     <option value="wxid">微信号（精确）</option>
@@ -222,13 +231,13 @@
                 <input type="text" class="search-input" id="searchInput" placeholder="请输入查询内容...">
                 <button class="search-btn" onclick="search()">查询</button>
             </div>
+            <div class="batch-tip">💡 批量查询：输入多个微信号或手机号，用逗号、空格或换行分隔</div>
             <div class="quick-filters">
                 <button class="filter-btn" id="filterAvailable" onclick="toggleFilter('available')">可加群（剩余>0）</button>
                 <button class="filter-btn" id="filterPhone" onclick="toggleFilter('phone')">有手机号</button>
                 <button class="filter-btn" id="filterVerified" onclick="toggleFilter('verified')">已实名</button>
                 <button class="filter-btn" id="filterClear" onclick="clearFilters()" style="background: #f8f9fa; color: #666;">清除筛选</button>
             </div>
-            <div class="batch-tip">💡 批量查询：输入多个微信号或手机号，用逗号、空格或换行分隔</div>
         </div>
         <div class="stats">
             共 <span id="totalCount">加载中...</span> 条坑位信息 | 数据更新时间：<span id="updateTime">--</span>
