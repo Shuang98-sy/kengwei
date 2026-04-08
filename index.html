@@ -110,7 +110,6 @@
             transform: translateY(0);
         }
         
-        /* 快速筛选按钮样式 */
         .quick-filters {
             display: flex;
             gap: 10px;
@@ -257,7 +256,6 @@
             border-radius: 3px;
         }
         
-        /* 剩余可加群聊数颜色标记 */
         .slot-count {
             font-weight: bold;
             padding: 4px 10px;
@@ -329,7 +327,6 @@
                 <button class="search-btn" onclick="search()">查询</button>
             </div>
             
-            <!-- 快速筛选按钮 -->
             <div class="quick-filters">
                 <button class="filter-btn" id="filterAvailable" onclick="toggleFilter('available')">
                     可加群（剩余>0）
@@ -375,16 +372,16 @@
         };
         let currentSort = 'none';
         let lastSearchResults = [];
+        let lastSearchType = '';
+        let lastSearchKeyword = '';
         
-        // 页面加载时获取数据
         async function loadData() {
             try {
                 const response = await fetch('./data.json');
                 if (!response.ok) throw new Error('数据加载失败');
                 const jsonData = await response.json();
                 
-                // 从JSON中读取数据和时间
-                DATA = jsonData.data || jsonData; // 兼容旧格式
+                DATA = jsonData.data || jsonData;
                 const updateTime = jsonData.update_time || '未知';
                 
                 document.getElementById('totalCount').textContent = DATA.length;
@@ -395,7 +392,7 @@
                             <circle cx="11" cy="11" r="8"/>
                             <path d="M21 21l-4.35-4.35"/>
                         </svg>
-                        <p>输入关键词开始查询</p>
+                        <p>输入关键词开始查询，或点击上方筛选按钮</p>
                     </div>
                 `;
             } catch (error) {
@@ -413,17 +410,14 @@
             }
         }
         
-        // 初始化
         loadData();
         
-        // 回车搜索
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 search();
             }
         });
         
-        // 快速筛选切换
         function toggleFilter(filterType) {
             activeFilters[filterType] = !activeFilters[filterType];
             
@@ -434,28 +428,38 @@
                 btn.classList.remove('active');
             }
             
-            // 如果有搜索结果，重新应用筛选
-            if (lastSearchResults.length > 0) {
-                applyFiltersAndDisplay();
+            if (lastSearchResults.length === 0) {
+                lastSearchResults = [...DATA];
+                lastSearchType = 'all';
+                lastSearchKeyword = '全部';
             }
+            
+            applyFiltersAndDisplay();
         }
         
-        // 清除所有筛选
         function clearFilters() {
             activeFilters = {
                 available: false,
                 phone: false,
                 verified: false
             };
+            currentSort = 'none';
             
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
-            // 如果有搜索结果，重新显示
-            if (lastSearchResults.length > 0) {
-                applyFiltersAndDisplay();
-            }
+            lastSearchResults = [];
+            
+            document.getElementById('resultSection').innerHTML = `
+                <div class="no-result">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <p>输入关键词开始查询，或点击上方筛选按钮</p>
+                </div>
+            `;
         }
         
         function search() {
@@ -475,19 +479,16 @@
             let results = [];
             
             if (type === 'nickname') {
-                // 昵称模糊匹配
                 results = DATA.filter(item => {
                     const nickname = item['微信昵称'] || '';
                     return nickname.includes(keyword);
                 });
             } else if (type === 'wxid') {
-                // 微信号精确匹配
                 results = DATA.filter(item => {
                     const wxid = item['微信号'] || '';
                     return wxid === keyword;
                 });
             } else if (type === 'phone') {
-                // 手机号精确匹配
                 results = DATA.filter(item => {
                     const phone = String(item['手机号'] || '');
                     return phone === keyword;
@@ -504,7 +505,6 @@
         function applyFiltersAndDisplay() {
             let filtered = [...lastSearchResults];
             
-            // 应用筛选
             if (activeFilters.available) {
                 filtered = filtered.filter(item => {
                     const slots = parseInt(item['剩余可加群聊数']) || 0;
@@ -526,7 +526,6 @@
                 });
             }
             
-            // 应用排序
             if (currentSort === 'desc') {
                 filtered.sort((a, b) => {
                     const slotsA = parseInt(a['剩余可加群聊数']) || 0;
@@ -569,7 +568,7 @@
                 return;
             }
             
-            const typeText = type === 'nickname' ? '微信昵称' : (type === 'wxid' ? '微信号' : '手机号');
+            const typeText = type === 'nickname' ? '微信昵称' : (type === 'wxid' ? '微信号' : (type === 'phone' ? '手机号' : '全部数据'));
             
             let html = `
                 <div class="result-info">
@@ -631,7 +630,6 @@
             
             section.innerHTML = html;
             
-            // 恢复排序选择状态
             if (currentSort !== 'none') {
                 document.getElementById('sortSelect').value = currentSort;
             }
@@ -639,7 +637,6 @@
         
         function highlightKeyword(text, keyword, type) {
             if (type === 'nickname') {
-                // 模糊匹配时高亮关键词
                 const regex = new RegExp(`(${escapeRegExp(keyword)})`, 'gi');
                 return text.replace(regex, '<span class="highlight">$1</span>');
             }
