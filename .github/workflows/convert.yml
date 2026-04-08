@@ -1,0 +1,44 @@
+name: Convert Excel to JSON
+
+on:
+  push:
+    paths:
+      - 'input/*.xlsx'
+      - 'input/*.xls'
+  workflow_dispatch:
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install pandas openpyxl
+
+      - name: Convert Excel to JSON
+        run: |
+          python convert.py
+
+      - name: Get current time
+        id: time
+        run: echo "time=$(date '+%Y-%m-%d %H:%M')" >> $GITHUB_OUTPUT
+
+      - name: Update time in index.html
+        run: |
+          sed -i "s/const UPDATE_TIME = '.*';/const UPDATE_TIME = '${{ steps.time.outputs.time }}';/" index.html
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data.json index.html
+          git diff --quiet && git diff --staged --quiet || git commit -m "自动更新数据 - ${{ steps.time.outputs.time }}"
+          git push
