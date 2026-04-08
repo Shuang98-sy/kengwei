@@ -5,19 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>坑位信息查询系统</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -26,30 +20,19 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
         }
-        
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
         }
-        
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-        
-        .header p {
-            opacity: 0.9;
-            font-size: 14px;
-        }
-        
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
         .search-section {
             padding: 30px;
             background: #f8f9fa;
             border-bottom: 1px solid #e9ecef;
         }
-        
         .search-box {
             display: flex;
             gap: 12px;
@@ -58,7 +41,6 @@
             justify-content: center;
             margin-bottom: 15px;
         }
-        
         .search-type {
             padding: 12px 16px;
             border: 2px solid #667eea;
@@ -69,11 +51,6 @@
             cursor: pointer;
             outline: none;
         }
-        
-        .search-type:focus {
-            border-color: #764ba2;
-        }
-        
         .search-input {
             flex: 1;
             min-width: 200px;
@@ -83,13 +60,8 @@
             border-radius: 8px;
             font-size: 16px;
             outline: none;
-            transition: border-color 0.3s;
         }
-        
-        .search-input:focus {
-            border-color: #667eea;
-        }
-        
+        .search-input:focus { border-color: #667eea; }
         .search-btn {
             padding: 12px 32px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -98,18 +70,8 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
-        
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-        
-        .search-btn:active {
-            transform: translateY(0);
-        }
-        
+        .search-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
         .quick-filters {
             display: flex;
             gap: 10px;
@@ -117,7 +79,6 @@
             justify-content: center;
             margin-top: 15px;
         }
-        
         .filter-btn {
             padding: 8px 16px;
             background: white;
@@ -125,21 +86,15 @@
             border-radius: 20px;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s;
             color: #555;
         }
-        
-        .filter-btn:hover {
-            border-color: #667eea;
-            color: #667eea;
-        }
-        
+        .filter-btn:hover { border-color: #667eea; color: #667eea; }
         .filter-btn.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-color: #667eea;
             color: white;
         }
-        
+        .batch-tip { font-size: 12px; color: #999; text-align: center; margin-top: 10px; }
         .stats {
             text-align: center;
             padding: 15px;
@@ -147,16 +102,8 @@
             color: #666;
             font-size: 14px;
         }
-        
-        .stats span {
-            color: #667eea;
-            font-weight: bold;
-        }
-        
-        .result-section {
-            padding: 20px;
-        }
-        
+        .stats span { color: #667eea; font-weight: bold; }
+        .result-section { padding: 20px; }
         .result-info {
             margin-bottom: 15px;
             padding: 12px 16px;
@@ -170,18 +117,9 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        
-        .sort-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .sort-controls label {
-            font-size: 13px;
-            color: #666;
-        }
-        
+        .result-actions { display: flex; gap: 8px; align-items: center; }
+        .sort-controls { display: flex; align-items: center; gap: 8px; }
+        .sort-controls label { font-size: 13px; color: #666; }
         .sort-select {
             padding: 6px 12px;
             border: 1px solid #ddd;
@@ -189,73 +127,28 @@
             font-size: 13px;
             cursor: pointer;
         }
-        
-        .no-result {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-        
-        .no-result svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-            color: #667eea;
-        }
-        
-        .loading p {
-            margin-top: 15px;
-        }
-        
-        .error {
-            text-align: center;
-            padding: 60px 20px;
-            color: #e74c3c;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        
-        thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .export-btn {
+            padding: 6px 16px;
+            background: #28a745;
             color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
         }
-        
-        th {
-            padding: 14px 12px;
-            text-align: left;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-        
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        tbody tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .table-container {
-            overflow-x: auto;
-        }
-        
-        .highlight {
-            background: #fff3cd;
-            padding: 2px 4px;
-            border-radius: 3px;
-        }
-        
+        .export-btn:hover { background: #218838; }
+        .no-result { text-align: center; padding: 60px 20px; color: #999; }
+        .no-result svg { width: 80px; height: 80px; margin-bottom: 20px; opacity: 0.5; }
+        .loading { text-align: center; padding: 60px 20px; color: #667eea; }
+        .loading p { margin-top: 15px; }
+        .error { text-align: center; padding: 60px 20px; color: #e74c3c; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        thead { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        th { padding: 14px 12px; text-align: left; font-weight: 500; white-space: nowrap; }
+        td { padding: 12px; border-bottom: 1px solid #e9ecef; }
+        tbody tr:hover { background: #f8f9fa; }
+        .table-container { overflow-x: auto; }
+        .highlight { background: #fff3cd; padding: 2px 4px; border-radius: 3px; }
         .slot-count {
             font-weight: bold;
             padding: 4px 10px;
@@ -264,22 +157,31 @@
             min-width: 30px;
             text-align: center;
         }
-        
-        .slot-high {
-            background: #d4edda;
-            color: #155724;
+        .slot-high { background: #d4edda; color: #155724; }
+        .slot-medium { background: #fff3cd; color: #856404; }
+        .slot-low { background: #f8d7da; color: #721c24; }
+        .card-container { display: none; flex-direction: column; gap: 12px; }
+        .data-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
-        .slot-medium {
-            background: #fff3cd;
-            color: #856404;
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
         }
-        
-        .slot-low {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
+        .card-nickname { font-size: 16px; font-weight: bold; color: #333; }
+        .card-slot { font-weight: bold; padding: 4px 12px; border-radius: 12px; font-size: 14px; }
+        .card-body { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .card-item { font-size: 13px; }
+        .card-label { color: #999; margin-bottom: 2px; }
+        .card-value { color: #333; font-weight: 500; }
         .footer {
             text-align: center;
             padding: 20px;
@@ -287,25 +189,20 @@
             color: #999;
             font-size: 12px;
         }
-        
         @media (max-width: 768px) {
-            .search-box {
-                flex-direction: column;
-            }
-            
-            .search-input {
-                max-width: 100%;
-            }
-            
-            th, td {
-                padding: 10px 8px;
-                font-size: 13px;
-            }
-            
-            .result-info {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+            body { padding: 10px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 22px; }
+            .search-section { padding: 20px; }
+            .search-box { flex-direction: column; }
+            .search-input { max-width: 100%; }
+            .result-section { padding: 15px; }
+            .result-info { flex-direction: column; align-items: stretch; }
+            .result-actions { flex-wrap: wrap; justify-content: space-between; }
+            .table-container { display: none; }
+            .card-container { display: flex; }
+            .quick-filters { gap: 8px; }
+            .filter-btn { padding: 6px 12px; font-size: 12px; }
         }
     </style>
 </head>
@@ -315,7 +212,6 @@
             <h1>🔍 坑位信息查询系统</h1>
             <p>支持微信昵称模糊查询，微信ID/手机号精确查询</p>
         </div>
-        
         <div class="search-section">
             <div class="search-box">
                 <select class="search-type" id="searchType">
@@ -326,27 +222,17 @@
                 <input type="text" class="search-input" id="searchInput" placeholder="请输入查询内容...">
                 <button class="search-btn" onclick="search()">查询</button>
             </div>
-            
             <div class="quick-filters">
-                <button class="filter-btn" id="filterAvailable" onclick="toggleFilter('available')">
-                    可加群（剩余>0）
-                </button>
-                <button class="filter-btn" id="filterPhone" onclick="toggleFilter('phone')">
-                    有手机号
-                </button>
-                <button class="filter-btn" id="filterVerified" onclick="toggleFilter('verified')">
-                    已实名
-                </button>
-                <button class="filter-btn" id="filterClear" onclick="clearFilters()" style="background: #f8f9fa; color: #666;">
-                    清除筛选
-                </button>
+                <button class="filter-btn" id="filterAvailable" onclick="toggleFilter('available')">可加群（剩余>0）</button>
+                <button class="filter-btn" id="filterPhone" onclick="toggleFilter('phone')">有手机号</button>
+                <button class="filter-btn" id="filterVerified" onclick="toggleFilter('verified')">已实名</button>
+                <button class="filter-btn" id="filterClear" onclick="clearFilters()" style="background: #f8f9fa; color: #666;">清除筛选</button>
             </div>
+            <div class="batch-tip">💡 批量查询：输入多个微信号或手机号，用逗号、空格或换行分隔</div>
         </div>
-        
         <div class="stats">
             共 <span id="totalCount">加载中...</span> 条坑位信息 | 数据更新时间：<span id="updateTime">--</span>
         </div>
-        
         <div class="result-section" id="resultSection">
             <div class="loading" id="loading">
                 <svg width="50" height="50" viewBox="0 0 50 50">
@@ -357,294 +243,117 @@
                 <p>正在加载数据...</p>
             </div>
         </div>
-        
-        <div class="footer">
-            数据更新时间：请查看页面上方显示的时间
-        </div>
+        <div class="footer">数据更新时间：请查看页面上方显示的时间</div>
     </div>
-
     <script>
-        let DATA = [];
-        let activeFilters = {
-            available: false,
-            phone: false,
-            verified: false
-        };
-        let currentSort = 'none';
-        let lastSearchResults = [];
-        let lastSearchType = '';
-        let lastSearchKeyword = '';
-        
+        let DATA = [], activeFilters = { available: false, phone: false, verified: false }, currentSort = 'none', lastSearchResults = [], lastSearchType = '', lastSearchKeyword = '';
         async function loadData() {
             try {
                 const response = await fetch('./data.json');
                 if (!response.ok) throw new Error('数据加载失败');
                 const jsonData = await response.json();
-                
                 DATA = jsonData.data || jsonData;
                 const updateTime = jsonData.update_time || '未知';
-                
                 document.getElementById('totalCount').textContent = DATA.length;
                 document.getElementById('updateTime').textContent = updateTime;
-                document.getElementById('resultSection').innerHTML = `
-                    <div class="no-result">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <circle cx="11" cy="11" r="8"/>
-                            <path d="M21 21l-4.35-4.35"/>
-                        </svg>
-                        <p>输入关键词开始查询，或点击上方筛选按钮</p>
-                    </div>
-                `;
+                document.getElementById('resultSection').innerHTML = '<div class="no-result"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><p>输入关键词开始查询，或点击上方筛选按钮</p></div>';
             } catch (error) {
-                document.getElementById('resultSection').innerHTML = `
-                    <div class="error">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="60" height="60">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="15" y1="9" x2="9" y2="15"/>
-                            <line x1="9" y1="9" x2="15" y2="15"/>
-                        </svg>
-                        <p>数据加载失败，请刷新页面重试</p>
-                    </div>
-                `;
+                document.getElementById('resultSection').innerHTML = '<div class="error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="60" height="60"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><p>数据加载失败，请刷新页面重试</p></div>';
                 document.getElementById('totalCount').textContent = '加载失败';
             }
         }
-        
         loadData();
-        
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                search();
-            }
-        });
-        
+        document.getElementById('searchInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') search(); });
         function toggleFilter(filterType) {
             activeFilters[filterType] = !activeFilters[filterType];
-            
             const btn = document.getElementById('filter' + filterType.charAt(0).toUpperCase() + filterType.slice(1));
-            if (activeFilters[filterType]) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-            
-            if (lastSearchResults.length === 0) {
-                lastSearchResults = [...DATA];
-                lastSearchType = 'all';
-                lastSearchKeyword = '全部';
-            }
-            
+            btn.classList.toggle('active', activeFilters[filterType]);
+            if (lastSearchResults.length === 0) { lastSearchResults = [...DATA]; lastSearchType = 'all'; lastSearchKeyword = '全部'; }
             applyFiltersAndDisplay();
         }
-        
         function clearFilters() {
-            activeFilters = {
-                available: false,
-                phone: false,
-                verified: false
-            };
+            activeFilters = { available: false, phone: false, verified: false };
             currentSort = 'none';
-            
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             lastSearchResults = [];
-            
-            document.getElementById('resultSection').innerHTML = `
-                <div class="no-result">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="M21 21l-4.35-4.35"/>
-                    </svg>
-                    <p>输入关键词开始查询，或点击上方筛选按钮</p>
-                </div>
-            `;
+            document.getElementById('resultSection').innerHTML = '<div class="no-result"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><p>输入关键词开始查询，或点击上方筛选按钮</p></div>';
         }
-        
         function search() {
             const type = document.getElementById('searchType').value;
-            const keyword = document.getElementById('searchInput').value.trim();
-            
-            if (!keyword) {
-                alert('请输入查询内容');
-                return;
-            }
-            
-            if (DATA.length === 0) {
-                alert('数据正在加载，请稍后再试');
-                return;
-            }
-            
+            const input = document.getElementById('searchInput').value.trim();
+            if (!input) { alert('请输入查询内容'); return; }
+            if (DATA.length === 0) { alert('数据正在加载，请稍后再试'); return; }
+            const keywords = input.split(/[,\s\n]+/).filter(k => k.trim()).map(k => k.trim());
             let results = [];
-            
             if (type === 'nickname') {
-                results = DATA.filter(item => {
-                    const nickname = item['微信昵称'] || '';
-                    return nickname.includes(keyword);
-                });
+                results = DATA.filter(item => { const nickname = item['微信昵称'] || ''; return keywords.some(keyword => nickname.includes(keyword)); });
             } else if (type === 'wxid') {
-                results = DATA.filter(item => {
-                    const wxid = item['微信号'] || '';
-                    return wxid === keyword;
-                });
+                results = DATA.filter(item => { const wxid = item['微信号'] || ''; return keywords.some(keyword => wxid === keyword); });
             } else if (type === 'phone') {
-                results = DATA.filter(item => {
-                    const phone = String(item['手机号'] || '');
-                    return phone === keyword;
-                });
+                results = DATA.filter(item => { const phone = String(item['手机号'] || ''); return keywords.some(keyword => phone === keyword); });
             }
-            
             lastSearchResults = results;
             lastSearchType = type;
-            lastSearchKeyword = keyword;
-            
+            lastSearchKeyword = keywords.length > 1 ? keywords[0] + ' 等' + keywords.length + '个' : keywords[0];
             applyFiltersAndDisplay();
         }
-        
         function applyFiltersAndDisplay() {
             let filtered = [...lastSearchResults];
-            
-            if (activeFilters.available) {
-                filtered = filtered.filter(item => {
-                    const slots = parseInt(item['剩余可加群聊数']) || 0;
-                    return slots > 0;
-                });
-            }
-            
-            if (activeFilters.phone) {
-                filtered = filtered.filter(item => {
-                    const phone = item['手机号'];
-                    return phone && phone !== '--' && phone !== '';
-                });
-            }
-            
-            if (activeFilters.verified) {
-                filtered = filtered.filter(item => {
-                    const verified = item['实名认证'] || '';
-                    return verified.includes('已') || verified.includes('是') || verified === '已实名';
-                });
-            }
-            
-            if (currentSort === 'desc') {
-                filtered.sort((a, b) => {
-                    const slotsA = parseInt(a['剩余可加群聊数']) || 0;
-                    const slotsB = parseInt(b['剩余可加群聊数']) || 0;
-                    return slotsB - slotsA;
-                });
-            } else if (currentSort === 'asc') {
-                filtered.sort((a, b) => {
-                    const slotsA = parseInt(a['剩余可加群聊数']) || 0;
-                    const slotsB = parseInt(b['剩余可加群聊数']) || 0;
-                    return slotsA - slotsB;
-                });
-            }
-            
+            if (activeFilters.available) filtered = filtered.filter(item => (parseInt(item['剩余可加群聊数']) || 0) > 0);
+            if (activeFilters.phone) filtered = filtered.filter(item => { const phone = item['手机号']; return phone && phone !== '--' && phone !== ''; });
+            if (activeFilters.verified) filtered = filtered.filter(item => { const verified = item['实名认证'] || ''; return verified.includes('已') || verified.includes('是') || verified === '已实名'; });
+            if (currentSort === 'desc') filtered.sort((a, b) => (parseInt(b['剩余可加群聊数']) || 0) - (parseInt(a['剩余可加群聊数']) || 0));
+            else if (currentSort === 'asc') filtered.sort((a, b) => (parseInt(a['剩余可加群聊数']) || 0) - (parseInt(b['剩余可加群聊数']) || 0));
             displayResults(filtered, lastSearchType, lastSearchKeyword);
         }
-        
-        function sortResults() {
-            currentSort = document.getElementById('sortSelect').value;
-            if (lastSearchResults.length > 0) {
-                applyFiltersAndDisplay();
-            }
+        function sortResults() { currentSort = document.getElementById('sortSelect').value; if (lastSearchResults.length > 0) applyFiltersAndDisplay(); }
+        function exportToExcel() {
+            if (lastSearchResults.length === 0) { alert('没有数据可导出'); return; }
+            let filtered = [...lastSearchResults];
+            if (activeFilters.available) filtered = filtered.filter(item => (parseInt(item['剩余可加群聊数']) || 0) > 0);
+            if (activeFilters.phone) filtered = filtered.filter(item => { const phone = item['手机号']; return phone && phone !== '--' && phone !== ''; });
+            if (activeFilters.verified) filtered = filtered.filter(item => { const verified = item['实名认证'] || ''; return verified.includes('已') || verified.includes('是') || verified === '已实名'; });
+            if (currentSort === 'desc') filtered.sort((a, b) => (parseInt(b['剩余可加群聊数']) || 0) - (parseInt(a['剩余可加群聊数']) || 0));
+            else if (currentSort === 'asc') filtered.sort((a, b) => (parseInt(a['剩余可加群聊数']) || 0) - (parseInt(b['剩余可加群聊数']) || 0));
+            const headers = ['设备编码2', '手机号', '微信号', '微信昵称', '实名认证', '设备状态', '投产状态', '剩余可加群聊数'];
+            let csv = '\uFEFF' + headers.join(',') + '\n';
+            filtered.forEach(item => {
+                const row = headers.map(h => {
+                    let val = item[h] || '';
+                    if (String(val).includes(',') || String(val).includes('\n')) val = '"' + String(val).replace(/"/g, '""') + '"';
+                    return val;
+                });
+                csv += row.join(',') + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '坑位信息_' + new Date().toLocaleDateString() + '.csv';
+            link.click();
         }
-        
         function displayResults(results, type, keyword) {
             const section = document.getElementById('resultSection');
-            
             if (results.length === 0) {
-                section.innerHTML = `
-                    <div class="no-result">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M8 15s1.5 2 4 2 4-2 4-2"/>
-                            <line x1="9" y1="9" x2="9.01" y2="9"/>
-                            <line x1="15" y1="9" x2="15.01" y2="9"/>
-                        </svg>
-                        <p>未找到匹配的记录</p>
-                    </div>
-                `;
+                section.innerHTML = '<div class="no-result"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg><p>未找到匹配的记录</p></div>';
                 return;
             }
-            
             const typeText = type === 'nickname' ? '微信昵称' : (type === 'wxid' ? '微信号' : (type === 'phone' ? '手机号' : '全部数据'));
-            
-            let html = `
-                <div class="result-info">
-                    <div>找到 <strong>${results.length}</strong> 条匹配记录（${typeText}：${keyword}）</div>
-                    <div class="sort-controls">
-                        <label>排序：</label>
-                        <select class="sort-select" id="sortSelect" onchange="sortResults()">
-                            <option value="none">默认</option>
-                            <option value="desc">剩余可加群聊数 ↓</option>
-                            <option value="asc">剩余可加群聊数 ↑</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>设备编码2</th>
-                                <th>手机号</th>
-                                <th>微信号</th>
-                                <th>微信昵称</th>
-                                <th>实名认证</th>
-                                <th>设备状态</th>
-                                <th>投产状态</th>
-                                <th>剩余可加群聊数</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
+            let html = '<div class="result-info"><div>找到 <strong>' + results.length + '</strong> 条匹配记录（' + typeText + '：' + keyword + '）</div><div class="result-actions"><div class="sort-controls"><label>排序：</label><select class="sort-select" id="sortSelect" onchange="sortResults()"><option value="none">默认</option><option value="desc">剩余可加群聊数 ↓</option><option value="asc">剩余可加群聊数 ↑</option></select></div><button class="export-btn" onclick="exportToExcel()">📥 导出Excel</button></div></div><div class="table-container"><table><thead><tr><th>设备编码2</th><th>手机号</th><th>微信号</th><th>微信昵称</th><th>实名认证</th><th>设备状态</th><th>投产状态</th><th>剩余可加群聊数</th></tr></thead><tbody>';
+            let cardHtml = '<div class="card-container">';
             results.forEach(item => {
                 const slots = parseInt(item['剩余可加群聊数']) || 0;
-                let slotClass = 'slot-low';
-                if (slots > 5) {
-                    slotClass = 'slot-high';
-                } else if (slots > 0) {
-                    slotClass = 'slot-medium';
-                }
-                
-                html += `
-                    <tr>
-                        <td>${item['设备编码2'] || '--'}</td>
-                        <td>${item['手机号'] || '--'}</td>
-                        <td>${item['微信号'] || '--'}</td>
-                        <td>${highlightKeyword(item['微信昵称'] || '--', keyword, type)}</td>
-                        <td>${item['实名认证'] || '--'}</td>
-                        <td>${item['设备状态'] || '--'}</td>
-                        <td>${item['投产状态'] || '--'}</td>
-                        <td><span class="slot-count ${slotClass}">${slots}</span></td>
-                    </tr>
-                `;
+                let slotClass = slots > 5 ? 'slot-high' : (slots > 0 ? 'slot-medium' : 'slot-low');
+                html += '<tr><td>' + (item['设备编码2'] || '--') + '</td><td>' + (item['手机号'] || '--') + '</td><td>' + (item['微信号'] || '--') + '</td><td>' + highlightKeyword(item['微信昵称'] || '--', keyword, type) + '</td><td>' + (item['实名认证'] || '--') + '</td><td>' + (item['设备状态'] || '--') + '</td><td>' + (item['投产状态'] || '--') + '</td><td><span class="slot-count ' + slotClass + '">' + slots + '</span></td></tr>';
+                cardHtml += '<div class="data-card"><div class="card-header"><div class="card-nickname">' + (item['微信昵称'] || '--') + '</div><span class="card-slot ' + slotClass + '">剩余 ' + slots + ' 个</span></div><div class="card-body"><div class="card-item"><div class="card-label">设备编码</div><div class="card-value">' + (item['设备编码2'] || '--') + '</div></div><div class="card-item"><div class="card-label">手机号</div><div class="card-value">' + (item['手机号'] || '--') + '</div></div><div class="card-item"><div class="card-label">微信号</div><div class="card-value">' + (item['微信号'] || '--') + '</div></div><div class="card-item"><div class="card-label">实名认证</div><div class="card-value">' + (item['实名认证'] || '--') + '</div></div><div class="card-item"><div class="card-label">设备状态</div><div class="card-value">' + (item['设备状态'] || '--') + '</div></div><div class="card-item"><div class="card-label">投产状态</div><div class="card-value">' + (item['投产状态'] || '--') + '</div></div></div></div>';
             });
-            
-            html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            section.innerHTML = html;
-            
-            if (currentSort !== 'none') {
-                document.getElementById('sortSelect').value = currentSort;
-            }
+            html += '</tbody></table></div>';
+            cardHtml += '</div>';
+            section.innerHTML = html + cardHtml;
+            if (currentSort !== 'none') document.getElementById('sortSelect').value = currentSort;
         }
-        
         function highlightKeyword(text, keyword, type) {
-            if (type === 'nickname') {
-                const regex = new RegExp(`(${escapeRegExp(keyword)})`, 'gi');
-                return text.replace(regex, '<span class="highlight">$1</span>');
-            }
+            if (type === 'nickname') return text.replace(new RegExp('(' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<span class="highlight">$1</span>');
             return text;
-        }
-        
-        function escapeRegExp(string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
     </script>
 </body>
