@@ -7,9 +7,6 @@ on:
       - 'input/*.xls'
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   convert:
     runs-on: ubuntu-latest
@@ -38,10 +35,10 @@ jobs:
         run: |
           sed -i "s/const UPDATE_TIME = '.*';/const UPDATE_TIME = '${{ steps.time.outputs.time }}';/" index.html
 
-- name: Commit changes
-  run: |
-    git config --local user.email "action@github.com"
-    git config --local user.name "GitHub Action"
-    git add .
-    git commit -m "Update data.json and timestamp"
-    git push --force
+      - name: Commit changes
+        run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git commit -m "Update data.json and timestamp"
+        git push --force
