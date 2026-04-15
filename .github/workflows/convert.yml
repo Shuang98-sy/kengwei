@@ -38,10 +38,10 @@ jobs:
         run: |
           sed -i "s/const UPDATE_TIME = '.*';/const UPDATE_TIME = '${{ steps.time.outputs.time }}';/" index.html
 
-      - name: Commit changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add data.json index.html
-          git diff --quiet && git diff --staged --quiet || git commit -m "自动更新数据 - ${{ steps.time.outputs.time }}"
-          git push
+- name: Commit changes
+  run: |
+    git config --local user.email "action@github.com"
+    git config --local user.name "GitHub Action"
+    git add .
+    git commit -m "Update data.json and timestamp"
+    git push --force
