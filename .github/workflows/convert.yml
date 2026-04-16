@@ -29,7 +29,7 @@ jobs:
     
     - name: Convert Excel to JSON
       run: |
-        python scripts/convert.py
+        python convert.py
     
     - name: Get current time
       id: time
