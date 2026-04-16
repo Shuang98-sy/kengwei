@@ -4,11 +4,11 @@
 Excel 转 JSON 脚本
 自动将 input 文件夹中的 Excel 文件转换为 data.json
 """
-
 import pandas as pd
 import json
 import os
 import glob
+from datetime import datetime
 
 def convert_excel_to_json():
     # 查找 input 文件夹中的 Excel 文件
@@ -31,15 +31,26 @@ def convert_excel_to_json():
         df = df.fillna('--')
         
         # 转换为字典列表
-        data = df.to_dict(orient='records')
+        records = df.to_dict(orient='records')
+        
+        # 获取当前时间
+        now = datetime.now()
+        update_time = now.strftime('%Y-%m-%d %H:%M')
+        
+        # 构建输出数据结构（包含更新时间和数据）
+        output = {
+            "update_time": update_time,
+            "data": records
+        }
         
         # 保存为 JSON
         with open('data.json', 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+            json.dump(output, f, ensure_ascii=False, indent=2)
         
-        print(f"转换成功！共 {len(data)} 条记录")
+        print(f"转换成功！共 {len(records)} 条记录")
+        print(f"更新时间：{update_time}")
         return True
-        
+    
     except Exception as e:
         print(f"转换失败: {e}")
         return False
