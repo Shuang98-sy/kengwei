@@ -1,48 +1,48 @@
-name: Convert Excel to JSON
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Excel 转 JSON 脚本
+自动将 input 文件夹中的 Excel 文件转换为 data.json
+"""
 
-on:
-  push:
-    paths:
-      - 'input/*.xlsx'
+import pandas as pd
+import json
+import os
+import glob
 
-permissions:
-  contents: write
+def convert_excel_to_json():
+    # 查找 input 文件夹中的 Excel 文件
+    input_dir = 'input'
+    excel_files = glob.glob(f'{input_dir}/*.xlsx') + glob.glob(f'{input_dir}/*.xls')
+    
+    if not excel_files:
+        print("未找到 Excel 文件！")
+        return False
+    
+    # 使用找到的第一个 Excel 文件
+    excel_file = excel_files[0]
+    print(f"正在处理文件: {excel_file}")
+    
+    try:
+        # 读取 Excel
+        df = pd.read_excel(excel_file)
+        
+        # 处理空值
+        df = df.fillna('--')
+        
+        # 转换为字典列表
+        data = df.to_dict(orient='records')
+        
+        # 保存为 JSON
+        with open('data.json', 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        
+        print(f"转换成功！共 {len(data)} 条记录")
+        return True
+        
+    except Exception as e:
+        print(f"转换失败: {e}")
+        return False
 
-jobs:
-  convert:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-    
-    - name: Install dependencies
-      run: |
-        pip install pandas openpyxl
-    
-    - name: Convert Excel to JSON
-      run: |
-        python convert.py
-    
-    - name: Get current time
-      id: time
-      run: echo "timestamp=$(date +'%Y-%m-%d %H:%M')" >> $GITHUB_OUTPUT
-    
-    - name: Update time in index.html
-      run: |
-        sed -i "s|数据更新时间：<span>[^<]*</span>|数据更新时间：<span>${{ steps.time.outputs.timestamp }}</span>|g" index.html
-    
-    - name: Commit changes
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add .
-        git commit -m "Update data.json and timestamp"
-        git push --force
+if __name__ == '__main__':
+    convert_excel_to_json()
